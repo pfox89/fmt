@@ -64,13 +64,13 @@ int (*instantiate_format_float)(double, int, detail::float_specs,
 #ifndef FMT_STATIC_THOUSANDS_SEPARATOR
 template FMT_API detail::locale_ref::locale_ref(const std::locale& loc);
 template FMT_API std::locale detail::locale_ref::get<std::locale>() const;
-#endif
 
 // Explicit instantiations for char.
 
 template FMT_API std::string detail::grouping_impl<char>(locale_ref);
 template FMT_API char detail::thousands_sep_impl(locale_ref);
 template FMT_API char detail::decimal_point_impl(locale_ref);
+#endif
 
 template FMT_API void detail::buffer<char>::append(const char*, const char*);
 
@@ -88,11 +88,13 @@ template FMT_API int detail::format_float(double, int, detail::float_specs,
 template FMT_API int detail::format_float(long double, int, detail::float_specs,
                                           detail::buffer<char>&);
 
+#ifndef FMT_STATIC_THOUSANDS_SEPARATOR
 // Explicit instantiations for wchar_t.
 
 template FMT_API std::string detail::grouping_impl<wchar_t>(locale_ref);
 template FMT_API wchar_t detail::thousands_sep_impl(locale_ref);
 template FMT_API wchar_t detail::decimal_point_impl(locale_ref);
+#endif
 
 template FMT_API void detail::buffer<wchar_t>::append(const wchar_t*,
                                                       const wchar_t*);

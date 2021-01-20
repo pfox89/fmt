@@ -9,7 +9,9 @@
 #define FMT_OS_H_
 
 #include <cerrno>
+#ifdef FMT_LOCALE
 #include <clocale>  // for locale_t
+#endif
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>  // for strtod_l
@@ -200,6 +202,7 @@ FMT_API void report_windows_error(int error_code,
                                   string_view message) FMT_NOEXCEPT;
 #endif  // _WIN32
 
+#if FMT_FILE_SUPPORT
 // A buffered file.
 class buffered_file {
  private:
@@ -253,6 +256,7 @@ class buffered_file {
     vprint(format_str, make_format_args(args...));
   }
 };
+#endif
 
 #if FMT_USE_FCNTL
 // A file. Closed file is represented by a file object with descriptor -1.

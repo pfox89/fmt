@@ -8,10 +8,35 @@
 #ifndef FMT_CORE_H_
 #define FMT_CORE_H_
 
+// For IAR, if we don't have libc locale support, we must use a static separator
+#if defined(__ICCARM__) && _DLIB_FULL_LOCALE_SUPPORT == 0
+#  define FMT_STATIC_THOUSANDS_SEPARATOR ','
+#endif
+
+// IAR may not support file descriptors
+#ifndef FMT_FILE_SUPPORT
+#  if defined(__ICCARM__) 
+#    if _DLIB_FILE_DESCRIPTOR
+#      define FMT_FILE_SUPPORT 1
+#    else
+#      define FMT_FILE_SUPPORT 0
+#    endif
+#  else
+#    define FMT_FILE_SUPPORT 1
+#  endif
+#endif
+
+#if FMT_FILE_SUPPORT
 #include <cstdio>  // std::FILE
+#endif
+
 #include <cstring>
 #include <iterator>
-#include <string>
+
+#if defined(FMT_STATIC_THOUSANDS_SEPARATOR) || FMT_LOCALE
+#include <string> // Only needed if we use locale support
+#endif
+
 #include <type_traits>
 
 // The fmt library version in the form major * 10000 + minor * 100 + patch.
@@ -252,6 +277,8 @@
 #  define FMT_COMPILE_TIME_CHECKS 0
 #endif
 
+  
+        
 FMT_BEGIN_NAMESPACE
 
 // Implementations of enable_if_t and other metafunctions for older systems.
@@ -1791,6 +1818,8 @@ void vformat_to(
     basic_format_args<FMT_BUFFER_CONTEXT(type_identity_t<Char>)> args,
     detail::locale_ref loc = {});
 
+#if FMT_FILE_SUPPORT
+
 template <typename Char, typename Args,
           FMT_ENABLE_IF(!std::is_same<Char, char>::value)>
 inline void vprint_mojibake(std::FILE*, basic_string_view<Char>, const Args&) {}
@@ -1799,6 +1828,9 @@ FMT_API void vprint_mojibake(std::FILE*, string_view, format_args);
 #ifndef _WIN32
 inline void vprint_mojibake(std::FILE*, string_view, format_args) {}
 #endif
+
+#endif
+
 }  // namespace detail
 
 /** Formats a string and writes the output to ``out``. */
@@ -1908,6 +1940,9 @@ FMT_INLINE std::basic_string<Char> format(const S& format_str, Args&&... args) {
 }
 
 FMT_API void vprint(string_view, format_args);
+
+#if FMT_FILE_SUPPORT
+
 FMT_API void vprint(std::FILE*, string_view, format_args);
 
 /**
@@ -1948,6 +1983,9 @@ inline void print(const S& format_str, Args&&... args) {
              : detail::vprint_mojibake(stdout, to_string_view(format_str),
                                        vargs);
 }
+
+#endif
+
 FMT_END_NAMESPACE
 
 #endif  // FMT_CORE_H_

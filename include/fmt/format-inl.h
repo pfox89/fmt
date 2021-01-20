@@ -38,9 +38,11 @@ FMT_BEGIN_NAMESPACE
 namespace detail {
 
 FMT_FUNC void assert_fail(const char* file, int line, const char* message) {
+#if FMT_FILE_SUPPORT
   // Use unchecked std::fprintf to avoid triggering another assertion when
   // writing to stderr fails
   std::fprintf(stderr, "%s:%d: assertion failed: %s", file, line, message);
+#endif
   // Chosen instead of std::abort to satisfy Clang in CUDA mode during device
   // code pass.
   std::terminate();
@@ -151,7 +153,7 @@ FMT_FUNC void format_error_code(detail::buffer<char>& out, int error_code,
   format_to(it, FMT_STRING("{}{}"), ERROR_STR, error_code);
   assert(out.size() <= inline_buffer_size);
 }
-
+#if FMT_FILE_SUPPORT
 FMT_FUNC void report_error(format_func func, int error_code,
                            string_view message) FMT_NOEXCEPT {
   memory_buffer full_message;
@@ -167,9 +169,10 @@ inline void fwrite_fully(const void* ptr, size_t size, size_t count,
   size_t written = std::fwrite(ptr, size, count, stream);
   if (written < count) FMT_THROW(system_error(errno, "cannot write to file"));
 }
+#endif
 }  // namespace detail
 
-#if !defined(FMT_STATIC_THOUSANDS_SEPARATOR)
+#ifndef FMT_STATIC_THOUSANDS_SEPARATOR
 namespace detail {
 
 template <typename Locale>
@@ -2749,6 +2752,8 @@ extern "C" __declspec(dllimport) int __stdcall WriteConsoleW(  //
 }  // namespace detail
 #endif
 
+#if FMT_FILE_SUPPORT
+
 FMT_FUNC void vprint(std::FILE* f, string_view format_str, format_args args) {
   memory_buffer buffer;
   detail::vformat_to(buffer, format_str,
@@ -2781,9 +2786,12 @@ FMT_FUNC void detail::vprint_mojibake(std::FILE* f, string_view format_str,
 }
 #endif
 
+
 FMT_FUNC void vprint(string_view format_str, format_args args) {
   vprint(stdout, format_str, args);
 }
+
+#endif
 
 FMT_END_NAMESPACE
 

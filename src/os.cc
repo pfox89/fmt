@@ -145,6 +145,8 @@ void report_windows_error(int error_code,
 }
 #endif  // _WIN32
 
+#if FMT_FILE_SUPPORT
+
 buffered_file::~buffered_file() FMT_NOEXCEPT {
   if (file_ && FMT_SYSTEM(fclose(file_)) != 0)
     report_system_error(errno, "cannot close file");
@@ -302,6 +304,7 @@ buffered_file file::fdopen(const char* mode) {
   fd_ = -1;
   return bf;
 }
+#endif
 
 long getpagesize() {
 #  ifdef _WIN32

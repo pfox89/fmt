@@ -1102,6 +1102,8 @@ template <> inline wchar_t decimal_point(locale_ref loc) {
   return decimal_point_impl<wchar_t>(loc);
 }
 
+#endif
+
 // Compares two characters for equality.
 template <typename Char> bool equal2(const Char* lhs, const char* rhs) {
   return lhs[0] == rhs[0] && lhs[1] == rhs[1];
@@ -4020,6 +4022,8 @@ std::basic_string<Char> detail::vformat(
   return to_string(buffer);
 }
 
+#if FMT_FILE_SUPPORT
+
 template <typename Char, FMT_ENABLE_IF(std::is_same<Char, wchar_t>::value)>
 void vprint(std::FILE* f, basic_string_view<Char> format_str,
             wformat_args args) {
@@ -4034,6 +4038,8 @@ template <typename Char, FMT_ENABLE_IF(std::is_same<Char, wchar_t>::value)>
 void vprint(basic_string_view<Char> format_str, wformat_args args) {
   vprint(stdout, format_str, args);
 }
+
+#endif
 
 #if FMT_USE_USER_DEFINED_LITERALS
 namespace detail {
