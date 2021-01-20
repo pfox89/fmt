@@ -377,7 +377,9 @@ template <typename Char> class basic_string_view {
  public:
   using value_type = Char;
   using iterator = const Char*;
-
+  using const_iterator = iterator;
+  using const_reference = const Char&;
+  
   constexpr basic_string_view() FMT_NOEXCEPT : data_(nullptr), size_(0) {}
 
   /** Constructs a string reference object from a C string and a size. */
@@ -410,16 +412,23 @@ template <typename Char> class basic_string_view {
                                                       size_(s.size()) {}
 
   /** Returns a pointer to the string data. */
-  constexpr const Char* data() const { return data_; }
+  constexpr const Char* data() const FMT_NOEXCEPT { return data_; }
 
   /** Returns the string size. */
-  constexpr size_t size() const { return size_; }
+  constexpr size_t size() const FMT_NOEXCEPT { return size_; }
 
-  constexpr iterator begin() const { return data_; }
-  constexpr iterator end() const { return data_ + size_; }
+  constexpr bool empty() const FMT_NOEXCEPT { return size_ == 0; }
+  
+  constexpr iterator begin() const FMT_NOEXCEPT { return data_; }
+  constexpr iterator end() const FMT_NOEXCEPT { return data_ + size_; }
 
-  constexpr const Char& operator[](size_t pos) const { return data_[pos]; }
+  constexpr const_iterator cbegin() const FMT_NOEXCEPT { return data_; }
+  constexpr const_iterator cend() const FMT_NOEXCEPT { return data_ + size_; }
+  
+  constexpr const Char& operator[](size_t pos) const FMT_NOEXCEPT { return data_[pos]; }
 
+  constexpr const_reference back() const { return data_[size_-1]; }
+    
   FMT_CONSTEXPR void remove_prefix(size_t n) {
     data_ += n;
     size_ -= n;
