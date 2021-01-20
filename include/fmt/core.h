@@ -110,8 +110,10 @@
 #  if (defined(__GNUC__) && !defined(__EXCEPTIONS)) || \
       FMT_MSC_VER && !_HAS_EXCEPTIONS
 #    define FMT_EXCEPTIONS 0
-#  else
+#  elseif defined(__cpp_exceptions)
 #    define FMT_EXCEPTIONS 1
+#  else
+#    define FMT_EXCEPTIONS 0
 #  endif
 #endif
 
@@ -130,7 +132,7 @@
 #endif
 
 #ifndef FMT_NOEXCEPT
-#  if FMT_EXCEPTIONS || FMT_HAS_CXX11_NOEXCEPT
+#  if FMT_EXCEPTIONS || FMT_HAS_CXX11_NOEXCEPT && (!defined(__ICCARM__) || FMT_EXCEPTIONS)
 #    define FMT_NOEXCEPT FMT_DETECTED_NOEXCEPT
 #  else
 #    define FMT_NOEXCEPT
