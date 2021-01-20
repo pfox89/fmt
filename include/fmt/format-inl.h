@@ -18,15 +18,16 @@
 #include <cwchar>
 #include <exception>
 
-#ifndef FMT_STATIC_THOUSANDS_SEPARATOR
-#  include <locale>
-#endif
 
 #ifdef _WIN32
 #  include <io.h>  // _isatty
 #endif
 
 #include "format.h"
+
+#ifndef FMT_STATIC_THOUSANDS_SEPARATOR
+#  include <locale>
+#endif
 
 // Dummy implementations of strerror_r and strerror_s called if corresponding
 // system functions are not available.
@@ -193,17 +194,6 @@ template <typename Char> FMT_FUNC Char decimal_point_impl(locale_ref loc) {
       .decimal_point();
 }
 }  // namespace detail
-#else
-template <typename Char>
-FMT_FUNC std::string detail::grouping_impl(locale_ref) {
-  return "\03";
-}
-template <typename Char> FMT_FUNC Char detail::thousands_sep_impl(locale_ref) {
-  return FMT_STATIC_THOUSANDS_SEPARATOR;
-}
-template <typename Char> FMT_FUNC Char detail::decimal_point_impl(locale_ref) {
-  return '.';
-}
 #endif
 
 FMT_API FMT_FUNC format_error::~format_error() FMT_NOEXCEPT = default;

@@ -1060,7 +1060,25 @@ template <typename Int> constexpr int digits10() FMT_NOEXCEPT {
 template <> constexpr int digits10<int128_t>() FMT_NOEXCEPT { return 38; }
 template <> constexpr int digits10<uint128_t>() FMT_NOEXCEPT { return 38; }
 
+#ifdef FMT_STATIC_THOUSANDS_SEPARATOR
+
+// Don't need locale, so we can make these inline and use string_view for less wieght
+template <typename Char> inline Char decimal_point(locale_ref) {
+  return Char('.');
+}
+
+template <typename Char> inline basic_string_view<Char> grouping(locale_ref loc) {
+  return "\03";
+}
+
+template <typename Char> inline Char thousands_sep(locale_ref loc) {
+  return Char(FMT_STATIC_THOUSANDS_SEPARATOR);
+}
+
+#else
+
 template <typename Char> FMT_API std::string grouping_impl(locale_ref loc);
+
 template <typename Char> inline std::string grouping(locale_ref loc) {
   return grouping_impl<char>(loc);
 }
@@ -1755,13 +1773,13 @@ template <typename OutputIt, typename Char, typename UInt> struct int_writer {
   enum { sep_size = 1 };
 
   void on_num() {
-    std::string groups = grouping<Char>(locale);
+    auto groups = grouping<Char>(locale);
     if (groups.empty()) return write_dec();
     auto sep = thousands_sep<Char>(locale);
     if (!sep) return write_dec();
     int num_digits = count_digits(abs_value);
     int size = num_digits, n = num_digits;
-    std::string::const_iterator group = groups.cbegin();
+    auto group = groups.cbegin();
     while (group != groups.cend() && n > *group && *group > 0 &&
            *group != max_value<char>()) {
       size += sep_size;
@@ -3907,12 +3925,15 @@ extern template void detail::vformat_to(detail::buffer<char>&, string_view,
                                         detail::locale_ref);
 namespace detail {
 
+#ifndef FMT_STATIC_THOUSANDS_SEPARATOR
 extern template FMT_API std::string grouping_impl<char>(locale_ref loc);
 extern template FMT_API std::string grouping_impl<wchar_t>(locale_ref loc);
 extern template FMT_API char thousands_sep_impl<char>(locale_ref loc);
 extern template FMT_API wchar_t thousands_sep_impl<wchar_t>(locale_ref loc);
 extern template FMT_API char decimal_point_impl(locale_ref loc);
 extern template FMT_API wchar_t decimal_point_impl(locale_ref loc);
+#endif
+
 extern template int format_float<double>(double value, int precision,
                                          float_specs specs, buffer<char>& buf);
 extern template int format_float<long double>(long double value, int precision,
