@@ -201,6 +201,14 @@ FMT_END_NAMESPACE
 #  include <intrin.h>  // _BitScanReverse[64], _BitScanForward[64], _umul128
 #endif
 
+#if defined(__ARM_ACLE) && __ARM_ARCH>= 7
+#  include <arm_acle.h> // __clz, __clzll
+#  define FMT_BUILTIN_CLZ(n)   __clz(n)
+#  define FMT_BUILTIN_CLZLL(n) __clzll(n)
+#  define FMT_BUILTIN_CTZ(n)   __clz(__rbit(n))
+#  define FMT_BUILTIN_CTZLL(n) __clzll(__rbitll(n))
+#endif
+        
 // Some compilers masquerade as both MSVC and GCC-likes or otherwise support
 // __builtin_clz and __builtin_clzll, so only define FMT_BUILTIN_CLZ using the
 // MSVC intrinsics if the clz and clzll builtins are not available.
