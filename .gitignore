@@ -35,3 +35,5 @@ FMT.build
 Makefile
 run-msbuild.bat
 fmt.pc
+support/iar/settings/
+support/iar/Debug/
