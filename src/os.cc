@@ -304,14 +304,13 @@ buffered_file file::fdopen(const char* mode) {
   fd_ = -1;
   return bf;
 }
-#endif
 
 long getpagesize() {
 #  ifdef _WIN32
   SYSTEM_INFO si;
   GetSystemInfo(&si);
   return si.dwPageSize;
-#  else
+#else
   long size = FMT_POSIX_CALL(sysconf(_SC_PAGESIZE));
   if (size < 0) FMT_THROW(system_error(errno, "cannot get memory page size"));
   return size;
@@ -322,4 +321,6 @@ FMT_API void ostream::grow(size_t) {
   if (this->size() == this->capacity()) flush();
 }
 #endif  // FMT_USE_FCNTL
+
+#endif // FMT_FILE_SUPPORT
 FMT_END_NAMESPACE
