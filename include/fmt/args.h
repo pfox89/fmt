@@ -126,7 +126,7 @@ class dynamic_format_arg_store
   template <typename T>
   void emplace_arg(const detail::named_arg<char_type, T>& arg) {
     if (named_info_.empty()) {
-      constexpr const detail::named_arg_info<char_type>* zero_ptr{nullptr};
+      static constexpr const detail::named_arg_info<char_type>* zero_ptr{nullptr};
       data_.insert(data_.begin(), {zero_ptr, 0});
     }
     data_.emplace_back(detail::make_arg<Context>(detail::unwrap(arg.value)));
