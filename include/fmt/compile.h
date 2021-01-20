@@ -528,6 +528,8 @@ constexpr auto parse_tail(T head, S format_str) {
   } else {
     return head;
   }
+  // We should never get here, but some compilers will complain if there's no return
+  return unknown_format();
 }
 
 template <typename T, typename Char> struct parse_specs_result {
@@ -584,6 +586,8 @@ constexpr auto compile_format_string(S format_str) {
                                        format_str);
     }
   }
+  // We should never get here, but some compilers will complain if there's no return
+  return unknown_format();
 }
 
 template <typename... Args, typename S,
@@ -604,6 +608,8 @@ constexpr auto compile(S format_str) {
       return result;
     }
   }
+  // We should never get here, but some compilers will complain if there's no return
+  return unknown_format();
 }
 #else
 template <typename... Args, typename S,
